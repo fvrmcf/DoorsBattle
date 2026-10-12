@@ -1,13 +1,13 @@
 /**
  * UPGRADE.JS
- * Система апгрейда с круговым колесом фортуны (как рулетка со стрелкой).
+ * Система апгрейда с круговым колесом фортуны.
  */
 
 const UpgradeModule = {
     sourceItem: null,
     targetItem: null,
     isRolling: false,
-    wheelRotation: 0, // накопленный угол поворота колеса
+    wheelRotation: 0,
 
     sourceSlot: document.querySelector('[data-slot="source"]'),
     targetSlot: document.querySelector('[data-slot="target"]'),
@@ -122,12 +122,10 @@ const UpgradeModule = {
         );
     },
 
-    // Обновляет визуал колеса (зелёный/красный сектор) через conic-gradient
     updateWheelVisual() {
         const chance = this.calculateChance();
         this.chanceEl.textContent = `${chance.toFixed(1)}%`;
 
-        // conic-gradient: от 0deg (верх), зелёный сектор = chance%, остальное красное
         this.wheel.style.background = `conic-gradient(
             from 0deg,
             #00ff88 0%,
@@ -160,21 +158,17 @@ const UpgradeModule = {
         });
     },
 
-    // Физическая анимация кругового колеса
     spinWheel(chance, success, onComplete) {
         SoundModule.upgradeSpin();
 
-        // Угол тета — точка на окружности (0-360), которая должна оказаться под стрелкой (сверху)
         let theta;
         if (success) {
-            // Попадаем в зелёный сектор: от 0 до chance% окружности
             theta = Math.random() * (chance * 3.6);
         } else {
-            // Попадаем в красный сектор: от chance% до 100%
             theta = chance * 3.6 + Math.random() * ((100 - chance) * 3.6);
         }
 
-        const extraSpins = 5 + Math.floor(Math.random() * 3); // 5-7 полных оборотов для эффектности
+        const extraSpins = 5 + Math.floor(Math.random() * 3);
         const targetRotation = this.wheelRotation + extraSpins * 360 + (360 - theta);
 
         this.wheelRotation = targetRotation;
@@ -182,7 +176,6 @@ const UpgradeModule = {
         this.wheel.style.transition = 'transform 4s cubic-bezier(0.15, 0.8, 0.2, 1)';
         this.wheel.style.transform = `rotate(${targetRotation}deg)`;
 
-        // Тики по мере замедления колеса
         let tickDelay = 60;
         let elapsed = 0;
         const tickLoop = () => {
@@ -214,7 +207,6 @@ const UpgradeModule = {
             SoundModule.upgradeWin();
             UI.showToast(`✅ Успех! Вы получили: ${wonItem.name}`);
 
-            // Если выиграли что-то топовое — тоже конфетти
             if (wonItem.rarity === 'legendary' || wonItem.rarity === 'mythic') {
                 CasesModule.triggerLegendaryEffect(wonItem.rarity);
             }
