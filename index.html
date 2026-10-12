@@ -61,6 +61,50 @@
         <p class="empty-msg" id="emptyMsg">Пока пусто — открой свой первый кейс! 🎁</p>
       </div>
     </section>
+
+    <!-- ===== Апгрейд предметов (как на upgrader-сайтах, но валюта виртуальная) ===== -->
+    <section class="upgrade-section">
+      <h2 class="section-title">Апгрейд предметов <span class="note">⚠️ риск: при неудаче предмет сгорает</span></h2>
+      <div class="upgrade-panel">
+        <!-- Ваш предмет -->
+        <div class="up-slot" id="yourSlot" title="Выберите предмет из инвентаря ниже">
+          <div class="up-slot-label">Ваш предмет</div>
+          <div class="up-slot-body" id="yourSlotBody"><span class="up-placeholder">🎒</span></div>
+        </div>
+
+        <div class="up-vs">➜</div>
+
+        <!-- Целевой предмет -->
+        <div class="up-slot" id="targetSlot" title="Что хотите получить">
+          <div class="up-slot-label">Цель</div>
+          <div class="up-slot-body" id="targetSlotBody"><span class="up-placeholder">🎯</span></div>
+        </div>
+      </div>
+
+      <!-- Шанс и управление -->
+      <div class="up-controls">
+        <div class="up-chance-wrap">
+          <div class="up-chance-labels">
+            <span>Шанс успеха</span>
+            <b id="upChanceValue">—</b>
+          </div>
+          <input type="range" id="upChanceSlider" min="1" max="99" value="50" />
+        </div>
+        <button class="btn btn-upgrade" id="doUpgradeBtn" disabled>⬆️ Улучшить</button>
+      </div>
+
+      <!-- Выбор целевого предмета -->
+      <details class="up-target-picker" open>
+        <summary>Выбрать цель апгрейда</summary>
+        <div class="up-target-grid" id="upTargetGrid"></div>
+      </details>
+
+      <!-- Мой инвентарь для выбора "вашего предмета" -->
+      <details class="up-inv-picker">
+        <summary>Мой инвентарь (<span id="upInvCount">0</span>) — нажмите, чтобы выбрать</summary>
+        <div class="up-inv-grid" id="upInvGrid"></div>
+      </details>
+    </section>
   </main>
 
   <!-- ===== Модальное окно открытия кейса ===== -->
