@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>DOORS UPGRADER — симулятор кейсов</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🚪</text></svg>">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="logo">
+      <span class="logo-icon">🚪</span>
+      <span class="logo-text">DOORS<em>UPGRADER</em></span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="soundBtn" title="Звук">🔊</button>
+      <button class="icon-btn" id="resetBtn" title="Сбросить прогресс">↺</button>
+      <div class="balance">
+        <span class="balance-icon">🪙</span>
+        <b id="coins">1 000</b>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn is-active" data-tab="cases">📦 Кейсы</button>
+    <button class="tab-btn" data-tab="upgrades">⬆️ Апгрейды</button>
+  </nav>
+
+  <main>
+
+    <!-- ============ КЕЙСЫ ============ -->
+    <section class="page is-active" id="page-cases">
+
+      <div class="case-grid" id="caseGrid"></div>
+
+      <div class="reel-wrap" id="reelWrap">
+        <div class="reel" id="reel"></div>
+        <div class="reel-marker"></div>
+      </div>
+
+      <div class="section-head">
+        <h2>🎒 Инвентарь</h2>
+        <button class="btn btn-ghost btn-sm" id="sellAllBtn">Продать всё</button>
+      </div>
+      <div class="inv-grid" id="invCases"></div>
+
+    </section>
+
+    <!-- ============ АПГРЕЙДЫ ============ -->
+    <section class="page" id="page-upgrades">
+
+      <div class="upg-layout">
+
+        <aside class="panel">
+          <h3>1 · Предмет</h3>
+          <div class="inv-grid inv-scroll" id="invUpgrade"></div>
+        </aside>
+
+        <div class="panel upg-center">
+          <div class="wheel" id="wheel">
+            <canvas id="wheelCanvas"></canvas>
+            <div class="needle" id="needle"><i></i></div>
+            <div class="wheel-center">
+              <div class="wheel-pct" id="wheelPct">—</div>
+              <div class="wheel-label" id="wheelLabel">выберите предмет</div>
+            </div>
+          </div>
+
+          <div class="slots">
+            <div class="slot" id="slotFrom"><span class="slot-empty">Пусто</span></div>
+            <div class="slot-arrow">➜</div>
+            <div class="slot" id="slotTo"><span class="slot-empty">Пусто</span></div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" id="spinBtn" disabled>ПРОКАЧАТЬ</button>
+        </div>
+
+        <aside class="panel">
+          <h3>2 · Цель</h3>
+          <div class="inv-grid inv-scroll" id="invTargets"></div>
+        </aside>
+
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ МОДАЛКА ============ -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Вы получили</div>
+    <div class="modal-item" id="modalItem"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modalSell">Продать</button>
+      <button class="btn btn-primary" id="modalOk">Забрать</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
