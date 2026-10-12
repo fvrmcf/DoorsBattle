@@ -67,11 +67,16 @@ function checkDailyBonus() {
         Storage.setBalance(balance);
         UI.updateBalance(balance);
         Storage.setLastBonus(today);
-        setTimeout(() => UI.showToast('🎁 Ежедневный бонус: +500 монет!'), 500);
+        setTimeout(() => {
+            UI.showToast('🎁 Ежедневный бонус: +500 монет!');
+            SoundModule.bonus();
+        }, 500);
     }
 }
 
 function init() {
+    SoundModule.init();
+
     UI.updateBalance(Storage.getBalance());
 
     CasesModule.init();
