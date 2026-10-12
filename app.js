@@ -204,4 +204,104 @@ function spinRoulette() {
     balance -= currentCase.price;
     updateBalance();
     
-    const winningItem = 
+    const winningItem = getRandomItem(currentCase.chances);
+    const { itemWidth, winIndex } = buildRouletteItems(winningItem);
+    
+    // Запускаем анимацию прокрутки
+    setTimeout(() => {
+        const containerWidth = roulette.parentElement.offsetWidth;
+        const targetPosition = (winIndex * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
+        // Добавляем небольшой случайный сдвиг для реалистичности
+        const randomOffset = (Math.random() - 0.5) * 40;
+        
+        roulette.style.transition = 'transform 5s cubic-bezier(0.1, 0.7, 0.3, 1)';
+        roulette.style.transform = `translateX(-${targetPosition + randomOffset}px)`;
+        
+        setTimeout(() => {
+            finishSpin(winningItem);
+        }, 5200);
+    }, 50);
+}
+
+function finishSpin(item) {
+    isSpinning = false;
+    openBtn.disabled = false;
+    
+    // Добавляем в инвентарь
+    inventory.push(item);
+    localStorage.setItem('doors_inventory', JSON.stringify(inventory));
+    renderInventory();
+    
+    // Показываем результат
+    modalOverlay.classList.remove('active');
+    showResult(item);
+}
+
+function showResult(item) {
+    const resultItem = document.getElementById('resultItem');
+    resultItem.className = `result-item rarity-${item.rarity}`;
+    
+    const rarityNames = {
+        common: 'Обычный',
+        rare: 'Редкий',
+        epic: 'Эпический',
+        legendary: 'Легендарный'
+    };
+    
+    resultItem.innerHTML = `
+        <span class="icon">${item.icon}</span>
+        <span class="name">${item.name}</span>
+        <span class="rarity-label">${rarityNames[item.rarity]}</span>
+    `;
+    
+    resultOverlay.classList.add('active');
+}
+
+function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+}
+
+// ===== СОБЫТИЯ =====
+function setupEvents() {
+    openBtn.addEventListener('click', spinRoulette);
+    
+    document.getElementById('closeModal').addEventListener('click', () => {
+        if (!isSpinning) {
+            modalOverlay.classList.remove('active');
+        }
+    });
+    
+    document.getElementById('continueBtn').addEventListener('click', () => {
+        resultOverlay.classList.remove('active');
+    });
+    
+    // Закрытие по клику на оверлей
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay && !isSpinning) {
+            modalOverlay.classList.remove('active');
+        }
+    });
+}
+
+// Бонус: ежедневная награда (для баланса, чтобы не было грустно без доната)
+function checkDailyBonus() {
+    const lastBonus = localStorage.getItem('doors_last_bonus');
+    const today = new Date().toDateString();
+    
+    if (lastBonus !== today) {
+        balance += 500;
+        updateBalance();
+        localStorage.setItem('doors_last_bonus', today);
+        setTimeout(() => {
+            showToast('🎁 Ежедневный бонус: +500 монет!');
+        }, 500);
+    }
+}
+
+// Запуск
+init();
+checkDailyBonus();
