@@ -1,11 +1,12 @@
 /**
  * CASES.JS
- * Логика открытия кейсов: рендер списка, рулетка, выбор предмета по шансам.
+ * Логика открытия кейсов: рулетка, звуки, конфетти для топовых дропов.
  */
 
 const CasesModule = {
     currentCase: null,
     isSpinning: false,
+    _pendingItem: null,
 
     grid: document.querySelector('[data-cases-grid]'),
     roulette: document.querySelector('[data-roulette]'),
@@ -88,7 +89,7 @@ const CasesModule = {
         this.roulette.style.transform = 'translateX(0)';
         this.roulette.classList.remove('roulette--flash');
 
-        const totalItems = 50; // увеличили для более плавной ленты
+        const totalItems = 50;
         const winIndex = 42;
 
         for (let i = 0; i < totalItems; i++) {
@@ -134,9 +135,8 @@ const CasesModule = {
         const { winIndex } = this.buildRoulette(winningItem);
 
         const itemWidth = 146;
-        const spinDuration = 5500; // мс, должно совпадать с CSS transition
+        const spinDuration = 5500;
 
-        // Запускаем звуковые тики, синхронизированные с длительностью анимации
         setTimeout(() => {
             SoundModule.playSpinTicks(spinDuration);
         }, 50);
@@ -146,7 +146,6 @@ const CasesModule = {
             const targetPos = (winIndex * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
             const randomOffset = (Math.random() - 0.5) * 40;
 
-            // CS:GO-style easing: быстрый старт, долгое плавное замедление
             this.roulette.style.transition = `transform ${spinDuration}ms cubic-bezier(0.12, 0.8, 0.15, 1)`;
             this.roulette.style.transform = `translateX(-${targetPos + randomOffset}px)`;
 
@@ -158,7 +157,6 @@ const CasesModule = {
         }, 50);
     },
 
-    // Подсветка выигрышного элемента перед финалом
     flashWinningItem() {
         this.roulette.classList.add('roulette--flash');
         const items = this.roulette.querySelectorAll('.roulette-item');
@@ -180,21 +178,17 @@ const CasesModule = {
 
         SoundModule.reveal(item.rarity);
 
-        // Особый эффект для редких дропов
         if (item.rarity === 'legendary' || item.rarity === 'mythic') {
             this.triggerLegendaryEffect(item.rarity);
         }
     },
 
-    // Конфетти + вспышка экрана для топовых дропов
     triggerLegendaryEffect(rarity) {
-        // Вспышка на весь экран
         const flash = document.createElement('div');
         flash.className = `screen-flash screen-flash--${rarity}`;
         document.body.appendChild(flash);
         setTimeout(() => flash.remove(), 800);
 
-        // Конфетти
         const colors = rarity === 'mythic'
             ? ['#ff2255', '#ff6688', '#ffaacc']
             : ['#ff8800', '#ffaa33', '#ffd700'];
