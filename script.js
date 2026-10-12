@@ -214,10 +214,6 @@ function rollItem(c) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function rarityRank(key) {
-  return Object.keys(RARITY).indexOf(ITEMS[key].rarity);
-}
-
 let toastTimer = null;
 function toast(msg) {
   const t = $('toast');
@@ -356,6 +352,10 @@ function renderInventory(container, mode) {
 }
 
 function sellItem(uid) {
+  // ЗАЩИТА: во время вращения колеса ничего продавать нельзя
+  if (wheelSpinning) { toast('Колесо крутится…'); Sound.error(); return; }
+  if (spinningCase)  { toast('Подожди…'); Sound.error(); return; }
+
   const i = state.inventory.findIndex(function (x) { return x.uid === uid; });
   if (i === -1) return;
   const val = ITEMS[state.inventory[i].key].value;
@@ -371,7 +371,7 @@ function sellItem(uid) {
    7. КЕЙСЫ — РУЛЕТКА
    ============================================================ */
 
-const REEL_STEP   = 134;   // 124px карточка + 10px отступ (см. CSS)
+const REEL_STEP   = 134;   // 124px карточка + 10px отступ
 const REEL_COUNT  = 54;
 const REEL_WIN_IX = 46;
 
@@ -459,6 +459,7 @@ let targetKey     = null;
 let wheelSpinning = false;
 let needleDeg     = 0;
 let wheelCssSize  = 340;
+let spinStake     = null;   // { uid, key } — предмет, поставленный на кон
 
 const canvas = els.canvas;
 const ctx2d  = canvas.getContext('2d');
@@ -539,7 +540,6 @@ function drawWheel() {
   /* деления */
   const tickOuter = R - 10;
   const tickInner = R - 17;
-  ctx2d.strokeStyle = '#31313f';
   ctx2d.lineWidth = 1.6;
   for (let deg = 0; deg < 360; deg += 4.5) {
     const a = (deg - 90) * Math.PI / 180;
@@ -733,6 +733,33 @@ function spinWheel() {
   wheelSpinning = true;
   els.spinBtn.disabled = true;
   els.spinBtn.textContent = 'КРУТИМ…';
+
+  // ========== ЗАЩИТА ОТ БАГА ==========
+  // 1. Запоминаем предмет, поставленный на кон
+  spinStake = { uid: selectedUid, key: sel.key };
+
+  // 2. СРАЗУ удаляем его из инвентаря — теперь его нельзя продать
+  state.inventory = state.inventory.filter(function (x) { return x.uid !== spinStake.uid; });
+
+  // 3. Блокируем весь UI
+  els.invUpgrade.classList.add('is-locked');
+  els.invTargets.classList.add('is-locked');
+  els.sellAllBtn.disabled = true;
+
+  // 4. Обновляем отображение (предмет уже пропал из инвентаря, но слот "from" показываем вручную)
+  renderInventory(els.invUpgrade, 'select');
+  renderInventory(els.invCases, 'sell');
+
+  // 5. Слот "from" показываем как "в игре" — используем сохранённый spinStake
+  const stakeIt = ITEMS[spinStake.key], stakeR = RARITY[stakeIt.rarity];
+  els.slotFrom.className = 'slot is-filled';
+  els.slotFrom.style.setProperty('--c', stakeR.color);
+  els.slotFrom.innerHTML =
+    '<div class="slot-icon">' + stakeIt.icon + '</div>' +
+    '<div class="slot-name">' + stakeIt.name + '</div>' +
+    '<div class="slot-val">🪙 ' + fmt(stakeIt.value) + '</div>';
+
+  save();
   Sound.spinUp();
 
   const winArc = chance * 360;
@@ -783,12 +810,18 @@ function finishSpin(isWin) {
   wheelSpinning = false;
   els.spinBtn.textContent = 'ПРОКАЧАТЬ';
 
-  const i = state.inventory.findIndex(function (x) { return x.uid === selectedUid; });
-  if (i === -1) { selectedUid = null; targetKey = null; updateAll(); return; }
+  // снимаем блокировку
+  els.invUpgrade.classList.remove('is-locked');
+  els.invTargets.classList.remove('is-locked');
+  els.sellAllBtn.disabled = false;
+
+  const staked = spinStake;
+  spinStake = null;
+
+  // предмет уже удалён из инвентаря в начале спина — здесь только добавляем выигрыш
 
   if (isWin) {
     const won = targetKey;
-    state.inventory.splice(i, 1);
     const newUid = state.uid++;
     state.inventory.push({ uid: newUid, key: won });
     state.stats.upgradesWin++;
@@ -799,7 +832,6 @@ function finishSpin(isWin) {
     Sound.win();
     showModal(won, newUid, '🎉 АПГРЕЙД УДАЛСЯ!');
   } else {
-    state.inventory.splice(i, 1);
     state.stats.upgradesLose++;
     selectedUid = null;
     targetKey = null;
@@ -874,6 +906,10 @@ document.querySelectorAll('.tab-btn').forEach(function (btn) {
 els.spinBtn.addEventListener('click', spinWheel);
 
 els.sellAllBtn.addEventListener('click', function () {
+  // ЗАЩИТА: во время вращения колеса / прокрутки кейса продавать нельзя
+  if (wheelSpinning) { toast('Колесо крутится…'); Sound.error(); return; }
+  if (spinningCase)  { toast('Подожди…'); Sound.error(); return; }
+
   if (!state.inventory.length) { toast('Инвентарь пуст'); Sound.error(); return; }
   let sum = 0;
   state.inventory.forEach(function (x) { sum += ITEMS[x.key].value; });
@@ -902,6 +938,7 @@ els.resetBtn.addEventListener('click', function () {
   state.stats = { casesOpened: 0, upgradesWin: 0, upgradesLose: 0 };
   selectedUid = null;
   targetKey = null;
+  spinStake = null;
   needleDeg = 0;
   els.needle.style.transform = 'rotate(0deg)';
   Sound.click();
@@ -912,6 +949,9 @@ els.resetBtn.addEventListener('click', function () {
 /* модалка */
 els.modalOk.addEventListener('click', function () { Sound.click(); closeModal(); });
 els.modalSell.addEventListener('click', function () {
+  // ЗАЩИТА: если колесо крутится — не продаём
+  if (wheelSpinning) { toast('Колесо крутится…'); Sound.error(); return; }
+
   if (modalUid !== null) {
     const uid = modalUid;
     closeModal();
