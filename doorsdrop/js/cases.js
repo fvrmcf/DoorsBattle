@@ -16,11 +16,15 @@ const CasesModule = {
         this.openBtn.addEventListener('click', () => this.spin());
 
         document.querySelector('[data-close-modal]').addEventListener('click', () => {
-            if (!this.isSpinning) UI.closeModal('case');
+            if (!this.isSpinning) {
+                UI.closeModal('case');
+                SoundModule.click();
+            }
         });
 
         document.querySelector('[data-continue-btn]').addEventListener('click', () => {
             UI.closeModal('result');
+            SoundModule.click();
         });
 
         document.querySelector('[data-sell-result]').addEventListener('click', () => {
@@ -43,7 +47,10 @@ const CasesModule = {
                 <div class="case-card__name">${c.name}</div>
                 <div class="case-card__price">🪙 ${c.price}</div>
             `;
-            card.addEventListener('click', () => this.openModal(c));
+            card.addEventListener('click', () => {
+                SoundModule.click();
+                this.openModal(c);
+            });
             this.grid.appendChild(card);
         });
     },
@@ -56,7 +63,6 @@ const CasesModule = {
         this.buildRoulette(null);
     },
 
-    // Выбор случайного предмета согласно таблице шансов
     rollItem(chances) {
         const rand = Math.random() * 100;
         let acc = 0;
@@ -80,9 +86,10 @@ const CasesModule = {
         this.roulette.innerHTML = '';
         this.roulette.style.transition = 'none';
         this.roulette.style.transform = 'translateX(0)';
+        this.roulette.classList.remove('roulette--flash');
 
-        const totalItems = 40;
-        const winIndex = 32;
+        const totalItems = 50; // увеличили для более плавной ленты
+        const winIndex = 42;
 
         for (let i = 0; i < totalItems; i++) {
             const item = (i === winIndex && winningItem)
@@ -107,11 +114,13 @@ const CasesModule = {
         const balance = Storage.getBalance();
         if (balance < this.currentCase.price) {
             UI.showToast('Недостаточно монет!');
+            SoundModule.upgradeLose();
             return;
         }
 
         this.isSpinning = true;
         this.openBtn.disabled = true;
+        SoundModule.caseOpen();
 
         const newBalance = balance - this.currentCase.price;
         Storage.setBalance(newBalance);
@@ -125,17 +134,38 @@ const CasesModule = {
         const { winIndex } = this.buildRoulette(winningItem);
 
         const itemWidth = 146;
+        const spinDuration = 5500; // мс, должно совпадать с CSS transition
+
+        // Запускаем звуковые тики, синхронизированные с длительностью анимации
+        setTimeout(() => {
+            SoundModule.playSpinTicks(spinDuration);
+        }, 50);
 
         setTimeout(() => {
             const containerWidth = this.roulette.parentElement.offsetWidth;
             const targetPos = (winIndex * itemWidth) - (containerWidth / 2) + (itemWidth / 2);
             const randomOffset = (Math.random() - 0.5) * 40;
 
-            this.roulette.style.transition = `transform var(--spin-duration) cubic-bezier(0.1, 0.7, 0.3, 1)`;
+            // CS:GO-style easing: быстрый старт, долгое плавное замедление
+            this.roulette.style.transition = `transform ${spinDuration}ms cubic-bezier(0.12, 0.8, 0.15, 1)`;
             this.roulette.style.transform = `translateX(-${targetPos + randomOffset}px)`;
 
-            setTimeout(() => this.finishSpin(winningItem), 5200);
+            setTimeout(() => {
+                SoundModule.stopTicks();
+                this.flashWinningItem();
+                setTimeout(() => this.finishSpin(winningItem), 400);
+            }, spinDuration);
         }, 50);
+    },
+
+    // Подсветка выигрышного элемента перед финалом
+    flashWinningItem() {
+        this.roulette.classList.add('roulette--flash');
+        const items = this.roulette.querySelectorAll('.roulette-item');
+        const winItem = items[42];
+        if (winItem) {
+            winItem.classList.add('roulette-item--winner');
+        }
     },
 
     finishSpin(item) {
@@ -147,6 +177,45 @@ const CasesModule = {
 
         UI.closeModal('case');
         this.showResult(item);
+
+        SoundModule.reveal(item.rarity);
+
+        // Особый эффект для редких дропов
+        if (item.rarity === 'legendary' || item.rarity === 'mythic') {
+            this.triggerLegendaryEffect(item.rarity);
+        }
+    },
+
+    // Конфетти + вспышка экрана для топовых дропов
+    triggerLegendaryEffect(rarity) {
+        // Вспышка на весь экран
+        const flash = document.createElement('div');
+        flash.className = `screen-flash screen-flash--${rarity}`;
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 800);
+
+        // Конфетти
+        const colors = rarity === 'mythic'
+            ? ['#ff2255', '#ff6688', '#ffaacc']
+            : ['#ff8800', '#ffaa33', '#ffd700'];
+
+        const particleCount = rarity === 'mythic' ? 80 : 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            setTimeout(() => this.createParticle(colors), i * 10);
+        }
+    },
+
+    createParticle(colors) {
+        const particle = document.createElement('div');
+        particle.className = 'confetti-particle';
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+        particle.style.width = particle.style.height = (6 + Math.random() * 8) + 'px';
+
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 4000);
     },
 
     updateStatsForItem(item) {
