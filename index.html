@@ -53,16 +53,19 @@
                 </div>
 
                 <div class="upgrade-panel__center">
-                    <div class="upgrade-wheel" data-upgrade-wheel>
-                        <div class="upgrade-wheel__fill" data-upgrade-fill></div>
-                        <div class="upgrade-wheel__pointer"></div>
-                        <div class="upgrade-wheel__chance" data-upgrade-chance>0%</div>
-                    </div>
-                    <button class="btn btn--primary" data-upgrade-btn disabled>
-                        Улучшить
-                    </button>
-                    <div class="upgrade-multiplier" data-upgrade-multiplier>x0.00</div>
-                </div>
+    <div class="wheel-wrapper">
+        <div class="wheel-pointer"></div>
+        <div class="wheel-circle" data-upgrade-wheel-circle>
+            <div class="wheel-center">
+                <span data-upgrade-chance>0%</span>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn--primary" data-upgrade-btn disabled>
+        Улучшить
+    </button>
+    <div class="upgrade-multiplier" data-upgrade-multiplier>x0.00</div>
+</div>
 
                 <div class="upgrade-panel__side">
                     <h3>Желаемый предмет</h3>
