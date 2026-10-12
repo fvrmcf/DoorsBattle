@@ -13,21 +13,18 @@
 
 <div class="app" data-app>
 
-    <!-- HEADER -->
     <header class="header" data-component="header">
         <h1 class="header__title">🚪 DOORS <span>CASE SIMULATOR</span></h1>
 
         <div class="header__stats">
-        <button class="sound-toggle" data-sound-toggle>🔊</button>
-    <div class="balance" data-component="balance">
-        <span class="balance__icon">🪙</span>
-        <span class="balance__value" data-balance>1000</span>
-    </div>
-</div>
-        
+            <button class="sound-toggle" data-sound-toggle>🔊</button>
+            <div class="balance" data-component="balance">
+                <span class="balance__icon">🪙</span>
+                <span class="balance__value" data-balance>1000</span>
+            </div>
+        </div>
     </header>
 
-    <!-- NAVIGATION -->
     <nav class="tabs" data-component="tabs">
         <button class="tabs__btn active" data-tab="cases">Кейсы</button>
         <button class="tabs__btn" data-tab="upgrade">Апгрейд</button>
@@ -37,12 +34,10 @@
 
     <main class="main">
 
-        <!-- === ВКЛАДКА: КЕЙСЫ === -->
         <section class="tab-content active" data-tab-content="cases">
             <div class="cases-grid" data-cases-grid></div>
         </section>
 
-        <!-- === ВКЛАДКА: АПГРЕЙД === -->
         <section class="tab-content" data-tab-content="upgrade">
             <div class="upgrade-panel" data-component="upgrade-panel">
 
@@ -55,19 +50,19 @@
                 </div>
 
                 <div class="upgrade-panel__center">
-    <div class="wheel-wrapper">
-        <div class="wheel-pointer"></div>
-        <div class="wheel-circle" data-upgrade-wheel-circle>
-            <div class="wheel-center">
-                <span data-upgrade-chance>0%</span>
-            </div>
-        </div>
-    </div>
-    <button class="btn btn--primary" data-upgrade-btn disabled>
-        Улучшить
-    </button>
-    <div class="upgrade-multiplier" data-upgrade-multiplier>x0.00</div>
-</div>
+                    <div class="wheel-wrapper">
+                        <div class="wheel-pointer"></div>
+                        <div class="wheel-circle" data-upgrade-wheel-circle>
+                            <div class="wheel-center">
+                                <span data-upgrade-chance>0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn--primary" data-upgrade-btn disabled>
+                        Улучшить
+                    </button>
+                    <div class="upgrade-multiplier" data-upgrade-multiplier>x0.00</div>
+                </div>
 
                 <div class="upgrade-panel__side">
                     <h3>Желаемый предмет</h3>
@@ -80,7 +75,6 @@
             </div>
         </section>
 
-        <!-- === ВКЛАДКА: ИНВЕНТАРЬ === -->
         <section class="tab-content" data-tab-content="inventory">
             <div class="inventory-toolbar">
                 <span data-inventory-count>0 предметов</span>
@@ -89,7 +83,6 @@
             <div class="inventory-grid" data-inventory-grid></div>
         </section>
 
-        <!-- === ВКЛАДКА: СТАТИСТИКА === -->
         <section class="tab-content" data-tab-content="stats">
             <div class="stats-grid" data-stats-grid></div>
         </section>
@@ -97,7 +90,6 @@
     </main>
 </div>
 
-<!-- МОДАЛКА ОТКРЫТИЯ КЕЙСА -->
 <div class="modal-overlay" data-modal="case">
     <div class="modal">
         <h2 data-modal-case-name>Открытие кейса</h2>
@@ -114,7 +106,6 @@
     </div>
 </div>
 
-<!-- МОДАЛКА РЕЗУЛЬТАТА -->
 <div class="result-overlay" data-modal="result">
     <div class="result-modal">
         <h3>Вы получили:</h3>
@@ -130,6 +121,7 @@
 
 <script src="js/data.js"></script>
 <script src="js/storage.js"></script>
+<script src="js/sounds.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/cases.js"></script>
 <script src="js/upgrade.js"></script>
