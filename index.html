@@ -1,146 +1,55 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DOORS Case Simulator — Симулятор кейсов</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOORS Case Simulator</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="bg-overlay"></div>
 
-  <!-- ===== Шапка ===== -->
-  <header class="topbar">
-    <div class="logo">
-      <span class="logo-icon">🚪</span>
-      <div>
-        <h1>DOORS<span>CASE</span></h1>
-        <p class="tagline">Симулятор кейсов · виртуальная валюта</p>
-      </div>
+<div class="container">
+    <header>
+        <h1 class="title">🚪 DOORS <span>CASE SIMULATOR</span></h1>
+        <div class="balance">
+            <span class="coin-icon">🪙</span>
+            <span id="balance">1000</span>
+        </div>
+    </header>
+
+    <div class="cases-grid" id="casesGrid"></div>
+
+    <div class="inventory-section">
+        <h2>Инвентарь</h2>
+        <div class="inventory" id="inventory"></div>
     </div>
-    <div class="wallet">
-      <div class="balance" id="balanceBox" title="Кликните, чтобы забрать ежедневную награду">
-        <span class="coin">🪙</span>
-        <span id="balanceValue">0</span>
-      </div>
-      <button class="btn btn-small" id="dailyBtn" title="Ежедневная награда +500">Ежедневно +500</button>
-      <button class="btn btn-small btn-ghost" id="resetBtn" title="Сбросить прогресс">⟲</button>
+</div>
+
+<!-- Модалка открытия кейса -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2 id="modalCaseName">Открытие кейса</h2>
+        <div class="roulette-container">
+            <div class="roulette-pointer"></div>
+            <div class="roulette" id="roulette"></div>
+        </div>
+        <button class="btn-open" id="openBtn">Открыть за <span id="openPrice">0</span> 🪙</button>
+        <button class="btn-close" id="closeModal">Закрыть</button>
     </div>
-  </header>
+</div>
 
-  <main>
-    <!-- ===== Выбор кейса ===== -->
-    <section class="cases-section">
-      <h2 class="section-title">Выбери кейс</h2>
-      <div class="cases-grid" id="casesGrid"></div>
-    </section>
-
-    <!-- ===== Магазин монет (виртуальных) ===== -->
-    <section class="shop-section">
-      <h2 class="section-title">Пополнить баланс <span class="note">(бесплатно, валюта виртуальная)</span></h2>
-      <div class="coins-grid">
-        <button class="coin-pack" data-coins="1000"><span class="pack-coin">🪙🪙</span><b>+1 000</b></button>
-        <button class="coin-pack" data-coins="5000"><span class="pack-coin">🪙🪙🪙</span><b>+5 000</b><i class="best">выгодно</i></button>
-        <button class="coin-pack" data-coins="25000"><span class="pack-coin">🪙🪙🪙🪙</span><b>+25 000</b><i class="best">+20% бонус</i></button>
-      </div>
-    </section>
-
-    <!-- ===== Инвентарь ===== -->
-    <section class="inventory-section">
-      <div class="inv-header">
-        <h2 class="section-title">Инвентарь <span class="count-badge" id="invCount">0</span></h2>
-        <div class="inv-actions">
-          <select id="sortSelect" class="select">
-            <option value="new">Сначала новые</option>
-            <option value="rarity">По редкости</option>
-          </select>
-          <button class="btn btn-small" id="sellAllBtn">Продать повторы</button>
-          <button class="btn btn-small btn-danger" id="clearInvBtn">Очистить</button>
-        </div>
-      </div>
-      <div class="inventory-grid" id="inventoryGrid">
-        <p class="empty-msg">Пока пусто — открой свой первый кейс! 🎁</p>
-      </div>
-    </section>
-
-    <!-- ===== Апгрейд предметов ===== -->
-    <section class="upgrade-section">
-      <h2 class="section-title">Апгрейд предметов <span class="note">⚠️ риск вымышленный: при неудаче предмет сгорает</span></h2>
-      <div class="upgrade-panel">
-        <div class="up-slot" id="yourSlot">
-          <div class="up-slot-label">Ваш предмет</div>
-          <div class="up-slot-body" id="yourSlotBody"><span class="up-placeholder">🎒</span></div>
-        </div>
-        <div class="up-vs">➜</div>
-        <div class="up-slot" id="targetSlot">
-          <div class="up-slot-label">Цель</div>
-          <div class="up-slot-body" id="targetSlotBody"><span class="up-placeholder">🎯</span></div>
-        </div>
-      </div>
-
-      <div class="up-controls">
-        <div class="up-chance-wrap">
-          <div class="up-chance-labels">
-            <span>Шанс успеха</span>
-            <b id="upChanceValue">—</b>
-          </div>
-          <input type="range" id="upChanceSlider" min="1" max="99" value="50" />
-        </div>
-        <button class="btn btn-upgrade" id="doUpgradeBtn" disabled>⬆️ Улучшить</button>
-      </div>
-
-      <details class="up-target-picker" open>
-        <summary>Выбрать цель апгрейда</summary>
-        <div class="up-target-grid" id="upTargetGrid"></div>
-      </details>
-
-      <details class="up-inv-picker">
-        <summary>Мой инвентарь (<span id="upInvCount">0</span>) — нажмите, чтобы выбрать</summary>
-        <div class="up-inv-grid" id="upInvGrid"></div>
-      </details>
-    </section>
-  </main>
-
-  <!-- ===== Модальное окно открытия кейса ===== -->
-  <div class="modal hidden" id="caseModal">
-    <div class="modal-backdrop" id="modalBackdrop"></div>
-    <div class="modal-box">
-      <button class="modal-close" id="modalClose">✕</button>
-      <h3 id="modalCaseName" class="modal-title">Кейс</h3>
-
-      <div class="open-row">
-        <button class="btn btn-open" id="openBtn">🎁 Открыть кейс</button>
-      </div>
-
-      <div class="roulette-wrap">
-        <div class="roulette-pointer"></div>
-        <div class="roulette-track" id="rouletteTrack"></div>
-      </div>
-
-      <div class="result hidden" id="resultBox">
-        <div class="result-card" id="resultCard">
-          <div class="result-img" id="resultImg"></div>
-          <div class="result-name" id="resultName"></div>
-          <div class="result-rarity" id="resultRarity"></div>
-        </div>
-        <div class="result-actions">
-          <button class="btn" id="openAgainBtn">Открыть ещё раз</button>
-          <button class="btn btn-green" id="sellItemBtn">Продать за <span id="sellPrice"></span> 🪙</button>
-        </div>
-      </div>
-
-      <details class="drops-info">
-        <summary>Что может выпасть?</summary>
-        <div class="drops-list" id="dropsList"></div>
-      </details>
+<!-- Модалка результата -->
+<div class="result-overlay" id="resultOverlay">
+    <div class="result-modal">
+        <h3>Вы получили:</h3>
+        <div class="result-item" id="resultItem"></div>
+        <button class="btn-continue" id="continueBtn">Продолжить</button>
     </div>
-  </div>
+</div>
 
-  <div class="toast-stack" id="toastStack"></div>
+<div class="toast" id="toast"></div>
 
-  <footer class="footer">
-    Фан-проект по мотивам Roblox DOORS · Никакой реальной валюты и покупок 🎮
-  </footer>
-
-  <script src="app.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
