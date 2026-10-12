@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOORS Case Simulator</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="bg-overlay"></div>
+
+<div class="app" data-app>
+
+    <!-- HEADER -->
+    <header class="header" data-component="header">
+        <h1 class="header__title">🚪 DOORS <span>CASE SIMULATOR</span></h1>
+
+        <div class="header__stats">
+            <div class="balance" data-component="balance">
+                <span class="balance__icon">🪙</span>
+                <span class="balance__value" data-balance>1000</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION -->
+    <nav class="tabs" data-component="tabs">
+        <button class="tabs__btn active" data-tab="cases">Кейсы</button>
+        <button class="tabs__btn" data-tab="upgrade">Апгрейд</button>
+        <button class="tabs__btn" data-tab="inventory">Инвентарь</button>
+        <button class="tabs__btn" data-tab="stats">Статистика</button>
+    </nav>
+
+    <main class="main">
+
+        <!-- === ВКЛАДКА: КЕЙСЫ === -->
+        <section class="tab-content active" data-tab-content="cases">
+            <div class="cases-grid" data-cases-grid></div>
+        </section>
+
+        <!-- === ВКЛАДКА: АПГРЕЙД === -->
+        <section class="tab-content" data-tab-content="upgrade">
+            <div class="upgrade-panel" data-component="upgrade-panel">
+
+                <div class="upgrade-panel__side">
+                    <h3>Ваш предмет</h3>
+                    <div class="upgrade-slot" data-slot="source">
+                        <span class="upgrade-slot__placeholder">Выберите предмет</span>
+                    </div>
+                    <div class="upgrade-item-list" data-upgrade-source-list></div>
+                </div>
+
+                <div class="upgrade-panel__center">
+                    <div class="upgrade-wheel" data-upgrade-wheel>
+                        <div class="upgrade-wheel__fill" data-upgrade-fill></div>
+                        <div class="upgrade-wheel__pointer"></div>
+                        <div class="upgrade-wheel__chance" data-upgrade-chance>0%</div>
+                    </div>
+                    <button class="btn btn--primary" data-upgrade-btn disabled>
+                        Улучшить
+                    </button>
+                    <div class="upgrade-multiplier" data-upgrade-multiplier>x0.00</div>
+                </div>
+
+                <div class="upgrade-panel__side">
+                    <h3>Желаемый предмет</h3>
+                    <div class="upgrade-slot" data-slot="target">
+                        <span class="upgrade-slot__placeholder">Выберите предмет</span>
+                    </div>
+                    <div class="upgrade-item-list" data-upgrade-target-list></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- === ВКЛАДКА: ИНВЕНТАРЬ === -->
+        <section class="tab-content" data-tab-content="inventory">
+            <div class="inventory-toolbar">
+                <span data-inventory-count>0 предметов</span>
+                <button class="btn btn--sm" data-sell-all>Продать всё (кроме редких+)</button>
+            </div>
+            <div class="inventory-grid" data-inventory-grid></div>
+        </section>
+
+        <!-- === ВКЛАДКА: СТАТИСТИКА === -->
+        <section class="tab-content" data-tab-content="stats">
+            <div class="stats-grid" data-stats-grid></div>
+        </section>
+
+    </main>
+</div>
+
+<!-- МОДАЛКА ОТКРЫТИЯ КЕЙСА -->
+<div class="modal-overlay" data-modal="case">
+    <div class="modal">
+        <h2 data-modal-case-name>Открытие кейса</h2>
+        <div class="roulette-container">
+            <div class="roulette-pointer"></div>
+            <div class="roulette" data-roulette></div>
+        </div>
+        <div class="modal__actions">
+            <button class="btn btn--primary" data-open-btn>
+                Открыть за <span data-open-price>0</span> 🪙
+            </button>
+            <button class="btn btn--ghost" data-close-modal>Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА РЕЗУЛЬТАТА -->
+<div class="result-overlay" data-modal="result">
+    <div class="result-modal">
+        <h3>Вы получили:</h3>
+        <div class="result-item" data-result-item></div>
+        <div class="modal__actions">
+            <button class="btn btn--ghost" data-sell-result>Продать</button>
+            <button class="btn btn--gold" data-continue-btn>Забрать</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" data-toast></div>
+
+<script src="js/data.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/cases.js"></script>
+<script src="js/upgrade.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
