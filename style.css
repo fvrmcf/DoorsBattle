@@ -222,11 +222,33 @@ body{
 }
 .inv-grid.inv-scroll{
   max-height: 430px; overflow-y:auto; padding-right:5px;
+  position: relative;
 }
 .inv-grid.inv-scroll::-webkit-scrollbar{ width:8px; }
 .inv-grid.inv-scroll::-webkit-scrollbar-track{ background:#0e0e14; border-radius:8px; }
 .inv-grid.inv-scroll::-webkit-scrollbar-thumb{ background:#31313f; border-radius:8px; }
 .inv-grid.inv-scroll::-webkit-scrollbar-thumb:hover{ background:#43435a; }
+
+/* Заблокированный инвентарь во время вращения колеса */
+.inv-grid.is-locked{
+  pointer-events: none;
+  opacity: .4;
+  filter: grayscale(.6);
+  transition: opacity .2s;
+}
+.inv-grid.is-locked::after{
+  content: '⏳ крутится…';
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 1.5px;
+  font-size: 13px;
+  pointer-events: none;
+  text-shadow: 0 0 12px rgba(0,0,0,.9);
+}
 
 .item-card{
   position:relative; border-radius:12px; padding:10px 7px 9px; text-align:center;
