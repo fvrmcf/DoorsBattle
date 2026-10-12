@@ -9,13 +9,13 @@ const InventoryModule = {
 
     init() {
         document.querySelector('[data-sell-all]').addEventListener('click', () => {
+            SoundModule.click();
             this.sellJunk();
         });
     },
 
     addItem(item) {
         const inventory = Storage.getInventory();
-        // гарантируем уникальный id предмета в инвентаре
         item.uid = item.uid || (Date.now() + Math.random());
         inventory.push(item);
         Storage.setInventory(inventory);
@@ -36,11 +36,11 @@ const InventoryModule = {
         stats.itemsSold += 1;
         Storage.setStats(stats);
 
+        SoundModule.click();
         UI.showToast(`Продано за 🪙 ${item.value}`);
         this.render();
     },
 
-    // Продать все предметы common/uncommon разом
     sellJunk() {
         const inventory = Storage.getInventory();
         const junk = inventory.filter(i => i.rarity === 'common' || i.rarity === 'uncommon');
@@ -89,7 +89,6 @@ const InventoryModule = {
             this.grid.appendChild(el);
         });
 
-        // Делегирование для кнопок продажи
         this.grid.querySelectorAll('[data-sell-uid]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const uid = parseFloat(e.target.dataset.sellUid);
