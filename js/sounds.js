@@ -1,35 +1,30 @@
 /**
  * SOUNDS.JS
- * Генерация звуков через Web Audio API.
- * Никаких внешних аудиофайлов — всё синтезируется на лету.
+ * Генерация звуков через Web Audio API. Аудиофайлы не нужны.
  */
 
 const SoundModule = {
     ctx: null,
     enabled: true,
-    tickTimeout: null,
+    tickTimeoutId: null,
 
     init() {
-        // AudioContext создаётся только после первого клика (требование браузеров)
+        this.enabled = Storage.getSoundEnabled();
+
         document.addEventListener('click', () => {
             if (!this.ctx) {
                 this.ctx = new (window.AudioContext || window.webkitAudioContext)();
             }
         }, { once: true });
 
-        // Кнопка вкл/выкл звука (если есть в разметке)
         const toggleBtn = document.querySelector('[data-sound-toggle]');
         if (toggleBtn) {
+            toggleBtn.textContent = this.enabled ? '🔊' : '🔇';
             toggleBtn.addEventListener('click', () => {
                 this.enabled = !this.enabled;
                 toggleBtn.textContent = this.enabled ? '🔊' : '🔇';
-                localStorage.setItem('doors_sound_enabled', this.enabled);
+                Storage.setSoundEnabled(this.enabled);
             });
-            const saved = localStorage.getItem('doors_sound_enabled');
-            if (saved !== null) {
-                this.enabled = saved === 'true';
-                toggleBtn.textContent = this.enabled ? '🔊' : '🔇';
-            }
         }
     },
 
@@ -42,7 +37,6 @@ const SoundModule = {
         }
     },
 
-    // Простой тон
     _playTone(freq, duration, type = 'sine', volume = 0.15, delay = 0) {
         if (!this.enabled) return;
         this._ensureContext();
@@ -64,40 +58,35 @@ const SoundModule = {
         osc.stop(this.ctx.currentTime + delay + duration);
     },
 
-    // Тик при прокрутке рулетки
     tick() {
         this._playTone(800 + Math.random() * 200, 0.05, 'square', 0.08);
     },
 
-    // Звук покупки/открытия кейса (старт)
     caseOpen() {
         this._playTone(200, 0.15, 'sawtooth', 0.1);
         this._playTone(300, 0.1, 'sawtooth', 0.08, 0.05);
     },
 
-    // Запускает серию тиков с замедлением (имитация физики рулетки CS:GO)
     playSpinTicks(totalDuration) {
         if (!this.enabled) return;
         let elapsed = 0;
-        let interval = 50; // стартовый интервал между тиками (мс)
+        let interval = 50;
 
         const scheduleTick = () => {
             if (elapsed >= totalDuration - 200) return;
             this.tick();
             elapsed += interval;
-            // Увеличиваем интервал — имитация замедления
             interval *= 1.08;
-            this.tickTimeout = setTimeout(scheduleTick, interval);
+            this.tickTimeoutId = setTimeout(scheduleTick, interval);
         };
 
         scheduleTick();
     },
 
     stopTicks() {
-        clearTimeout(this.tickTimeout);
+        clearTimeout(this.tickTimeoutId);
     },
 
-    // Звук результата в зависимости от редкости
     reveal(rarity) {
         if (!this.enabled) return;
 
@@ -128,7 +117,6 @@ const SoundModule = {
                 this._playTone(1047, 0.5, 'square', 0.18, 0.6);
             },
             mythic: () => {
-                // Самый драматичный звук — арпеджио + мощный финальный аккорд
                 [392, 523, 659, 784, 1047, 1319].forEach((freq, i) => {
                     this._playTone(freq, 0.25, 'square', 0.15, i * 0.12);
                 });
@@ -139,7 +127,6 @@ const SoundModule = {
         (sounds[rarity] || sounds.common)();
     },
 
-    // Звуки для апгрейда
     upgradeSpin() {
         this._playTone(300, 0.1, 'square', 0.1);
     },
@@ -155,12 +142,10 @@ const SoundModule = {
         this._playTone(200, 0.4, 'sawtooth', 0.15, 0.2);
     },
 
-    // Клик по кнопке/интерфейсу
     click() {
         this._playTone(600, 0.05, 'square', 0.08);
     },
 
-    // Ежедневный бонус
     bonus() {
         [523, 659, 784, 1047].forEach((freq, i) => {
             this._playTone(freq, 0.2, 'sine', 0.15, i * 0.1);
