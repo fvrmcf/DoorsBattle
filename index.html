@@ -31,7 +31,7 @@
     <!-- ===== Выбор кейса ===== -->
     <section class="cases-section">
       <h2 class="section-title">Выбери кейс</h2>
-      <div class="cases-grid" id="casesGrid"><!-- кейсы рендерятся из JS --></div>
+      <div class="cases-grid" id="casesGrid"></div>
     </section>
 
     <!-- ===== Магазин монет (виртуальных) ===== -->
@@ -58,30 +58,25 @@
         </div>
       </div>
       <div class="inventory-grid" id="inventoryGrid">
-        <p class="empty-msg" id="emptyMsg">Пока пусто — открой свой первый кейс! 🎁</p>
+        <p class="empty-msg">Пока пусто — открой свой первый кейс! 🎁</p>
       </div>
     </section>
 
-    <!-- ===== Апгрейд предметов (как на upgrader-сайтах, но валюта виртуальная) ===== -->
+    <!-- ===== Апгрейд предметов ===== -->
     <section class="upgrade-section">
-      <h2 class="section-title">Апгрейд предметов <span class="note">⚠️ риск: при неудаче предмет сгорает</span></h2>
+      <h2 class="section-title">Апгрейд предметов <span class="note">⚠️ риск вымышленный: при неудаче предмет сгорает</span></h2>
       <div class="upgrade-panel">
-        <!-- Ваш предмет -->
-        <div class="up-slot" id="yourSlot" title="Выберите предмет из инвентаря ниже">
+        <div class="up-slot" id="yourSlot">
           <div class="up-slot-label">Ваш предмет</div>
           <div class="up-slot-body" id="yourSlotBody"><span class="up-placeholder">🎒</span></div>
         </div>
-
         <div class="up-vs">➜</div>
-
-        <!-- Целевой предмет -->
-        <div class="up-slot" id="targetSlot" title="Что хотите получить">
+        <div class="up-slot" id="targetSlot">
           <div class="up-slot-label">Цель</div>
           <div class="up-slot-body" id="targetSlotBody"><span class="up-placeholder">🎯</span></div>
         </div>
       </div>
 
-      <!-- Шанс и управление -->
       <div class="up-controls">
         <div class="up-chance-wrap">
           <div class="up-chance-labels">
@@ -93,13 +88,11 @@
         <button class="btn btn-upgrade" id="doUpgradeBtn" disabled>⬆️ Улучшить</button>
       </div>
 
-      <!-- Выбор целевого предмета -->
       <details class="up-target-picker" open>
         <summary>Выбрать цель апгрейда</summary>
         <div class="up-target-grid" id="upTargetGrid"></div>
       </details>
 
-      <!-- Мой инвентарь для выбора "вашего предмета" -->
       <details class="up-inv-picker">
         <summary>Мой инвентарь (<span id="upInvCount">0</span>) — нажмите, чтобы выбрать</summary>
         <div class="up-inv-grid" id="upInvGrid"></div>
@@ -114,18 +107,15 @@
       <button class="modal-close" id="modalClose">✕</button>
       <h3 id="modalCaseName" class="modal-title">Кейс</h3>
 
-      <!-- Кнопка открытия -->
       <div class="open-row">
         <button class="btn btn-open" id="openBtn">🎁 Открыть кейс</button>
       </div>
 
-      <!-- Рулетка -->
       <div class="roulette-wrap">
         <div class="roulette-pointer"></div>
         <div class="roulette-track" id="rouletteTrack"></div>
       </div>
 
-      <!-- Результат -->
       <div class="result hidden" id="resultBox">
         <div class="result-card" id="resultCard">
           <div class="result-img" id="resultImg"></div>
@@ -138,7 +128,6 @@
         </div>
       </div>
 
-      <!-- Состав кейса -->
       <details class="drops-info">
         <summary>Что может выпасть?</summary>
         <div class="drops-list" id="dropsList"></div>
@@ -146,7 +135,6 @@
     </div>
   </div>
 
-  <!-- ===== Всплывающие уведомления ===== -->
   <div class="toast-stack" id="toastStack"></div>
 
   <footer class="footer">
