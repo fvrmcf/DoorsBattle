@@ -8,7 +8,8 @@ const STORAGE_KEYS = {
     inventory: 'doors_inventory',
     stats: 'doors_stats',
     lastBonus: 'doors_last_bonus',
-    achievements: 'doors_achievements'
+    achievements: 'doors_achievements',
+    soundEnabled: 'doors_sound_enabled'
 };
 
 const Storage = {
@@ -58,6 +59,14 @@ const Storage = {
     },
     setUnlockedAchievements(list) {
         localStorage.setItem(STORAGE_KEYS.achievements, JSON.stringify(list));
+    },
+
+    getSoundEnabled() {
+        const val = localStorage.getItem(STORAGE_KEYS.soundEnabled);
+        return val === null ? true : val === 'true';
+    },
+    setSoundEnabled(value) {
+        localStorage.setItem(STORAGE_KEYS.soundEnabled, value);
     },
 
     resetAll() {
