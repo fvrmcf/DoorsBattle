@@ -11,7 +11,7 @@ const RARITY_LABEL_RU = {
 };
 
 // ---------- Предметы (по мотивам DOORS) ----------
-// img — эмодзи-заглушка; позже можно заменить на картинки из Figma
+// img — эмодзи-заглушка; позже можно заменить на картинки из Figma (см. README)
 const ITEMS = {
   flashlight:    { name: "Фонарик",          rarity: "Common",    img: "🔦", sell: 40 },
   lighter:       { name: "Зажигалка",        rarity: "Common",    img: "🔥", sell: 50 },
@@ -410,4 +410,180 @@ function init() {
   });
 }
 
-init();
+/* init() вызывается на DOMContentLoaded (см. ниже) */
+
+/* =========================================================
+   АПГРЕЙД ПРЕДМЕТОВ (механика как на upgrader-сайтах)
+   Валюта и предметы — виртуальные, риск вымышленный.
+   ========================================================= */
+
+// Порядок редкостей для "цепочки улучшений"
+const RARITY_NEXT = {
+  Common: ["Uncommon", "Rare"],
+  Uncommon: ["Rare", "Epic"],
+  Rare: ["Epic", "Legendary"],
+  Epic: ["Legendary", "Mythic"],
+  Legendary: ["Mythic"],
+  Mythic: [] // дальше улучшать некуда
+};
+
+let yourItemId = null;   // что ставим на кон (из инвентаря)
+let targetItemId = null; // что хотим получить
+let upgrading = false;
+
+// --- Максимально честный шанс апгрейда по стоимости предметов ---
+// Как в upgrader'ах: chance ≈ (цена твоего / цена цели) * houseEdge
+const HOUSE_EDGE = 0.92; // 8% "комиссия дома" — чтобы был риск, но без обмана
+function maxUpgradeChance(fromId, toId) {
+  const from = ITEMS[fromId].sell, to = ITEMS[toId].sell;
+  if (to <= from) return 1;            // нельзя апгрейдить в то же/дешевле
+  let c = Math.floor((from / to) * HOUSE_EDGE * 100);
+  return Math.max(1, Math.min(99, c));
+}
+
+// Текущий выбранный шанс (ползунок), ограничен сверху максимальным
+function currentChance() {
+  if (!yourItemId || !targetItemId) return 0;
+  const cap = maxUpgradeChance(yourItemId, targetItemId);
+  const slider = parseInt($("upChanceSlider").value, 10);
+  return Math.min(slider, cap);
+}
+
+// --- Рендер слотов ---
+function slotItemHTML(id) {
+  const it = ITEMS[id];
+  return `<div class="up-item-img">${it.img}</div>
+          <div class="up-item-name t-${it.rarity}">${it.name}</div>
+          <div class="up-item-rarity t-${it.rarity}">${RARITY_LABEL_RU[it.rarity]} · 🪙${fmt(it.sell)}</div>`;
+}
+
+function renderUpSlots() {
+  const yb = $("yourSlotBody"), tb = $("targetSlotBody");
+  const ys = $("yourSlot"), ts = $("targetSlot");
+  ys.classList.toggle("filled", !!yourItemId);
+  ts.classList.toggle("filled", !!targetItemId);
+  yb.innerHTML = yourItemId ? slotItemHTML(yourItemId) : '<span class="up-placeholder">🎒</span>';
+  tb.innerHTML = targetItemId ? slotItemHTML(targetItemId) : '<span class="up-placeholder">🎯</span>';
+
+  // обновляем шанс и доступность кнопки
+  if (yourItemId && targetItemId) {
+    const cap = maxUpgradeChance(yourItemId, targetItemId);
+    const slider = $("upChanceSlider");
+    slider.max = cap;
+    if (parseInt(slider.value, 10) > cap) slider.value = cap;
+    $("upChanceValue").textContent = currentChance() + "%";
+    $("doUpgradeBtn").disabled = upgrading || cap < 1 || ITEMS[yourItemId].rarity === "Mythic";
+  } else {
+    $("upChanceValue").textContent = "—";
+    $("doUpgradeBtn").disabled = true;
+  }
+}
+
+// --- Сетка целей (все предметы, дороже текущего) ---
+function renderTargetGrid() {
+  const grid = $("upTargetGrid");
+  grid.innerHTML = "";
+  const sortedIds = Object.keys(ITEMS).sort((a, b) => ITEMS[a].sell - ITEMS[b].sell);
+  for (const id of sortedIds) {
+    const it = ITEMS[id];
+    const el = document.createElement("div");
+    const tooCheap = yourItemId ? it.sell <= ITEMS[yourItemId].sell : false;
+    el.className = "up-choice r-" + it.rarity +
+      (targetItemId === id ? " selected" : "") +
+      (tooCheap ? " disabled" : "");
+    el.innerHTML = `<div class="item-img">${it.img}</div>
+                    <div class="item-name">${it.name}</div>
+                    <div class="item-price">🪙 ${fmt(it.sell)}</div>`;
+    if (!tooCheap) el.addEventListener("click", () => { targetItemId = id; renderUpAll(); });
+    grid.appendChild(el);
+  }
+}
+
+// --- Сетка моего инвентаря (для выбора "вашего предмета") ---
+function renderUpInvGrid() {
+  const grid = $("upInvGrid");
+  const ids = Object.keys(state.inventory);
+  $("upInvCount").textContent = ids.reduce((s, id) => s + state.inventory[id], 0);
+  grid.innerHTML = "";
+  if (ids.length === 0) {
+    grid.innerHTML = `<p class="empty-msg">Инвентарь пуст — сначала откройте кейс 🙂</p>`;
+    return;
+  }
+  for (const id of ids) {
+    const it = ITEMS[id], cnt = state.inventory[id];
+    const el = document.createElement("div");
+    el.className = "up-choice r-" + it.rarity + (yourItemId === id ? " selected" : "");
+    el.innerHTML = `${cnt > 1 ? `<span class="dup-count">×${cnt}</span>` : ""}
+                    <div class="item-img">${it.img}</div>
+                    <div class="item-name">${it.name}</div>
+                    <div class="item-price">🪙 ${fmt(it.sell)}</div>`;
+    el.addEventListener("click", () => {
+      yourItemId = id;
+      // если цель стала дешевле или равна — сбрасываем её
+      if (targetItemId && ITEMS[targetItemId].sell <= ITEMS[yourItemId].sell) targetItemId = null;
+      $("upChanceSlider").value = 50;
+      renderUpAll();
+    });
+    grid.appendChild(el);
+  }
+}
+
+function renderUpAll() {
+  renderUpInvGrid();
+  renderTargetGrid();
+  renderUpSlots();
+}
+
+// --- Запуск апгрейда ---
+function doUpgrade() {
+  if (upgrading || !yourItemId || !targetItemId) return;
+  const chance = currentChance();
+  if (chance < 1) { toast("Нельзя апгрейдить Мифик ещё выше 😄", "error"); return; }
+  if ((state.inventory[yourItemId] || 0) < 1) { toast("Этого предмета нет в инвентаре.", "error"); return; }
+
+  upgrading = true;
+  $("doUpgradeBtn").disabled = true;
+  $("yourSlot").classList.remove("burning", "won");
+  $("targetSlot").classList.remove("burning", "won");
+
+  // "прокрутка" — мигание шанса для эффекта
+  let ticks = 0;
+  const tick = setInterval(() => {
+    $("upChanceValue").textContent = Math.floor(Math.random() * 100) + "%";
+    if (++ticks > 14) {
+      clearInterval(tick);
+      finishUpgrade(chance);
+    }
+  }, 120);
+}
+
+function finishUpgrade(chance) {
+  const won = Math.random() * 100 < chance;
+  // списываем предмет с кона в любом случае
+  state.inventory[yourItemId] -= 1;
+  if (state.inventory[yourItemId] <= 0) delete state.inventory[yourItemId];
+
+  if (won) {
+    state.inventory[targetItemId] = (state.inventory[targetItemId] || 0) + 1;
+    $("targetSlot").classList.add("won");
+    toast(`✅ Апгрейд удался! Получен: ${ITEMS[targetItemId].name}`, "success");
+  } else {
+    $("yourSlot").classList.add("burning");
+    toast(`🔥 Не повезло — ${ITEMS[yourItemId].name} сгорел. Шанс был ${chance}%`, "error");
+  }
+
+  saveState();
+  updateBalance();
+  renderInventory();
+  yourItemId = null; targetItemId = null;
+  upgrading = false;
+  // ждём окончания анимации слотов (600ms), чтобы перерендер её не сбивал
+  setTimeout(() => { $("yourSlot").classList.remove("burning"); $("targetSlot").classList.remove("won"); renderUpAll(); }, 1500);
+}
+
+// --- Подписка на элементы апгрейда ---
+$("upChanceSlider").addEventListener("input", renderUpSlots);
+$("doUpgradeBtn").addEventListener("click", doUpgrade);
+
+// Единая точка входа: init() + первичная отрисовка секции апгрейда
+window.addEventListener('DOMContentLoaded', () => { init(); renderUpAll(); });
