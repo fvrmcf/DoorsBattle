@@ -132,4 +132,114 @@ main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
 
 /* Рулетка */
 .roulette-wrap { position: relative; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); background: #0c0f16; }
-.roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); background: var(--gold); z-index: 5; box-shadow: 0 0 12px var(--
+.roulette-pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); background: var(--gold); z-index: 5; box-shadow: 0 0 12px var(--gold); }
+.roulette-track { display: flex; gap: 8px; padding: 12px 8px; will-change: transform; }
+.roulette-item {
+  flex: 0 0 110px; height: 140px; background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 6px;
+}
+.roulette-item .item-img { font-size: 44px; }
+.roulette-item .item-name { font-size: 11px; text-align: center; padding: 0 4px; }
+
+/* Цвета редкостей */
+.r-Common    { border-color: var(--r-common) !important; box-shadow: inset 0 -3px 0 var(--r-common); }
+.r-Uncommon  { border-color: var(--r-uncommon) !important; box-shadow: inset 0 -3px 0 var(--r-uncommon); }
+.r-Rare      { border-color: var(--r-rare) !important; box-shadow: inset 0 -3px 0 var(--r-rare); }
+.r-Epic      { border-color: var(--r-epic) !important; box-shadow: inset 0 -3px 0 var(--r-epic); }
+.r-Legendary { border-color: var(--r-legendary) !important; box-shadow: inset 0 -3px 0 var(--r-legendary); }
+.r-Mythic    { border-color: var(--r-mythic) !important; box-shadow: inset 0 -3px 0 var(--r-mythic); }
+.t-Common { color: var(--r-common); } .t-Uncommon { color: var(--r-uncommon); }
+.t-Rare { color: var(--r-rare); } .t-Epic { color: var(--r-epic); }
+.t-Legendary { color: var(--r-legendary); } .t-Mythic { color: var(--r-mythic); }
+
+/* Результат */
+.result { margin-top: 18px; text-align: center; }
+.result.hidden, .result.hidden * { display: none !important; }
+.result-card { display: inline-block; padding: 20px 40px; border-radius: 16px; background: var(--card); border: 2px solid; animation: popIn .45s cubic-bezier(.2,1.6,.4,1); }
+@keyframes popIn { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.result-img { font-size: 64px; }
+.result-name { font-size: 20px; font-weight: 700; margin-top: 8px; }
+.result-rarity { font-size: 13px; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+.result-actions { display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+
+.drops-info { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 12px; }
+.drops-info summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+.drops-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 12px; }
+.drop-row { display: flex; align-items: center; gap: 8px; font-size: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; }
+.drop-row .chance { margin-left: auto; color: var(--muted); }
+
+/* Тосты */
+.toast-stack { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 200; }
+.toast {
+  background: var(--card2); border: 1px solid var(--border); border-left: 4px solid var(--gold);
+  color: var(--text); padding: 10px 16px; border-radius: 10px; font-size: 14px;
+  animation: slideIn .3s ease, fadeOut .4s ease 2.6s forwards; max-width: 320px;
+}
+.toast.error { border-left-color: var(--red); }
+.toast.success { border-left-color: var(--green); }
+@keyframes slideIn { from { transform: translateX(40px); opacity: 0; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+.footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; border-top: 1px solid var(--border); }
+.mythic-flash { animation: mythicFlash 1.2s ease; }
+@keyframes mythicFlash { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 60px 20px rgba(248,113,113,.5); } }
+
+/* ============ Апгрейд предметов ============ */
+.upgrade-panel {
+  display: flex; align-items: center; justify-content: center; gap: 18px;
+  background: linear-gradient(180deg, #141826, #0e1119);
+  border: 1px solid var(--border); border-radius: 16px; padding: 22px; flex-wrap: wrap;
+}
+.up-slot {
+  width: 200px; text-align: center; background: var(--card);
+  border: 2px solid var(--border); border-radius: 14px; padding: 12px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.up-slot.filled { border-color: var(--gold); }
+.up-slot-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 8px; }
+.up-slot-body { min-height: 92px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.up-placeholder { font-size: 38px; opacity: .35; }
+.up-item-img { font-size: 44px; }
+.up-item-name { font-size: 13px; font-weight: 700; }
+.up-item-rarity { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.up-vs { font-size: 26px; color: var(--gold); }
+.up-slot.burning { animation: burnShake .6s ease; border-color: var(--red) !important; }
+@keyframes burnShake {
+  0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px) rotate(-1deg); }
+  40% { transform: translateX(6px) rotate(1deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); }
+}
+.up-slot.won { animation: winGlow 1s ease; border-color: var(--green) !important; }
+@keyframes winGlow { 50% { box-shadow: 0 0 40px 8px rgba(61,220,132,.45); } }
+
+.up-controls {
+  display: flex; align-items: center; gap: 16px; margin-top: 16px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; flex-wrap: wrap;
+}
+.up-chance-wrap { flex: 1; min-width: 220px; }
+.up-chance-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.up-chance-labels b { color: var(--gold); font-size: 16px; }
+#upChanceSlider { width: 100%; accent-color: var(--gold); cursor: pointer; }
+.btn-upgrade { background: linear-gradient(180deg, #b03a44, #8a2c34); border-color: #b03a44; font-size: 16px; padding: 12px 28px; }
+.btn-upgrade:hover:not(:disabled) { border-color: var(--red); transform: translateY(-1px); }
+
+.up-target-picker, .up-inv-picker { margin-top: 14px; }
+.up-target-picker summary, .up-inv-picker summary { cursor: pointer; color: var(--muted); font-size: 14px; padding: 4px 0; }
+.up-target-grid, .up-inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 10px; }
+.up-choice {
+  position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 8px; text-align: center; cursor: pointer; transition: all .15s; font-size: 11px;
+}
+.up-choice:hover { transform: translateY(-2px); }
+.up-choice.selected { border-color: var(--gold); background: var(--card2); }
+.up-choice.disabled { opacity: .35; cursor: not-allowed; }
+.up-choice .item-img { font-size: 28px; }
+.up-choice .item-name { font-weight: 600; margin-top: 3px; }
+.up-choice .item-price { color: var(--gold); font-size: 10px; margin-top: 2px; }
+.up-choice .dup-count { position: absolute; top: 4px; left: 4px; font-size: 10px; background: #000a; padding: 2px 6px; border-radius: 999px; color: var(--muted); }
+
+@media (max-width: 600px) {
+  .topbar { flex-direction: column; align-items: stretch; }
+  .roulette-item { flex-basis: 84px; height: 110px; }
+  .roulette-item .item-img { font-size: 32px; }
+}
