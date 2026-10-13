@@ -4,6 +4,13 @@
 'use strict';
 
 /* ============================================================
+   0. ОПРЕДЕЛЕНИЕ МОБИЛЬНОГО УСТРОЙСТВА
+   ============================================================ */
+const IS_MOBILE =
+  /Android|iPhone|iPad|iPod|Mobile|Opera Mini/i.test(navigator.userAgent) ||
+  (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+
+/* ============================================================
    1. ДАННЫЕ
    ============================================================ */
 
@@ -17,40 +24,42 @@ const RARITY = {
   secret:    { name: 'Секретный',   color: '#ff2fd0' }
 };
 
+/* icon — эмодзи (фолбэк), img — путь к картинке.
+   Если картинки нет — покажется эмодзи. */
 const ITEMS = {
   /* ---- common ---- */
-  coin:      { name: 'Монета',      icon: '🪙', rarity: 'common',    value: 10 },
-  bandage:   { name: 'Бинт',        icon: '🩹', rarity: 'common',    value: 20 },
-  battery:   { name: 'Батарейка',   icon: '🔋', rarity: 'common',    value: 25 },
-  candle:    { name: 'Свеча',       icon: '🕯️', rarity: 'common',    value: 30 },
-  lighter:   { name: 'Зажигалка',   icon: '🔥', rarity: 'common',    value: 40 },
+  coin:      { name:'Монета',      icon:'🪙', img:'img/items/coin.png',      rarity:'common',    value:10 },
+  bandage:   { name:'Бинт',        icon:'🩹', img:'img/items/bandage.png',   rarity:'common',    value:20 },
+  battery:   { name:'Батарейка',   icon:'🔋', img:'img/items/battery.png',   rarity:'common',    value:25 },
+  candle:    { name:'Свеча',       icon:'🕯️', img:'img/items/candle.png',    rarity:'common',    value:30 },
+  lighter:   { name:'Зажигалка',   icon:'🔥', img:'img/items/lighter.png',   rarity:'common',    value:40 },
   /* ---- uncommon ---- */
-  lockpick:  { name: 'Отмычка',     icon: '🗝️', rarity: 'uncommon',  value: 70 },
-  vitamins:  { name: 'Витамины',    icon: '💊', rarity: 'uncommon',  value: 85 },
-  flashlight:{ name: 'Фонарик',     icon: '🔦', rarity: 'uncommon',  value: 100 },
-  padlock:   { name: 'Замок',       icon: '🔒', rarity: 'uncommon',  value: 120 },
+  lockpick:  { name:'Отмычка',     icon:'🗝️', img:'img/items/lockpick.png',  rarity:'uncommon',  value:70 },
+  vitamins:  { name:'Витамины',    icon:'💊', img:'img/items/vitamins.png',  rarity:'uncommon',  value:85 },
+  flashlight:{ name:'Фонарик',     icon:'🔦', img:'img/items/flashlight.png',rarity:'uncommon',  value:100 },
+  padlock:   { name:'Замок',       icon:'🔒', img:'img/items/padlock.png',   rarity:'uncommon',  value:120 },
   /* ---- rare ---- */
-  window:    { name: 'Окно',        icon: '🪟', rarity: 'rare',      value: 200 },
-  timothy:   { name: 'Тимоти',      icon: '🕷️', rarity: 'rare',      value: 240 },
-  screech:   { name: 'Скрежет',     icon: '👻', rarity: 'rare',      value: 280 },
-  eyes:      { name: 'Глаза',       icon: '👁️', rarity: 'rare',      value: 320 },
+  window:    { name:'Окно',        icon:'🪟', img:'img/items/window.png',    rarity:'rare',      value:200 },
+  timothy:   { name:'Тимоти',      icon:'🕷️', img:'img/items/timothy.png',   rarity:'rare',      value:240 },
+  screech:   { name:'Скрежет',     icon:'👻', img:'img/items/screech.png',   rarity:'rare',      value:280 },
+  eyes:      { name:'Глаза',       icon:'👁️', img:'img/items/eyes.png',      rarity:'rare',      value:320 },
   /* ---- epic ---- */
-  hide:      { name: 'Хайд',        icon: '🚪', rarity: 'epic',      value: 600 },
-  rush:      { name: 'Раш',         icon: '💨', rarity: 'epic',      value: 750 },
-  ambush:    { name: 'Амбуш',       icon: '⚡', rarity: 'epic',      value: 900 },
-  halt:      { name: 'Хальт',       icon: '🛑', rarity: 'epic',      value: 1100 },
+  hide:      { name:'Хайд',        icon:'🚪', img:'img/items/hide.png',      rarity:'epic',      value:600 },
+  rush:      { name:'Раш',         icon:'💨', img:'img/items/rush.png',      rarity:'epic',      value:750 },
+  ambush:    { name:'Амбуш',       icon:'⚡', img:'img/items/ambush.png',    rarity:'epic',      value:900 },
+  halt:      { name:'Хальт',       icon:'🛑', img:'img/items/halt.png',      rarity:'epic',      value:1100 },
   /* ---- legendary ---- */
-  seek:      { name: 'Сек',         icon: '🖐️', rarity: 'legendary', value: 2000 },
-  figure:    { name: 'Фигура',      icon: '🗿', rarity: 'legendary', value: 2600 },
-  glitch:    { name: 'Глитч',       icon: '👾', rarity: 'legendary', value: 3200 },
+  seek:      { name:'Сек',         icon:'🖐️', img:'img/items/seek.png',      rarity:'legendary', value:2000 },
+  figure:    { name:'Фигура',      icon:'🗿', img:'img/items/figure.png',    rarity:'legendary', value:2600 },
+  glitch:    { name:'Глитч',       icon:'👾', img:'img/items/glitch.png',    rarity:'legendary', value:3200 },
   /* ---- mythical ---- */
-  crucifix:  { name: 'Крусификс',   icon: '✝️', rarity: 'mythical',  value: 6000 },
-  a90:       { name: 'A-90',        icon: '☠️', rarity: 'mythical',  value: 8000 },
-  a120:      { name: 'A-120',       icon: '🌀', rarity: 'mythical',  value: 10000 },
+  crucifix:  { name:'Крусификс',   icon:'✝️', img:'img/items/crucifix.png',  rarity:'mythical',  value:6000 },
+  a90:       { name:'A-90',        icon:'☠️', img:'img/items/a90.png',       rarity:'mythical',  value:8000 },
+  a120:      { name:'A-120',       icon:'🌀', img:'img/items/a120.png',      rarity:'mythical',  value:10000 },
   /* ---- secret ---- */
-  jack:      { name: 'Джек',        icon: '🎃', rarity: 'secret',    value: 15000 },
-  shadow:    { name: 'Тень',        icon: '🌑', rarity: 'secret',    value: 20000 },
-  voidkey:   { name: 'Войд',        icon: '🕳️', rarity: 'secret',    value: 30000 }
+  jack:      { name:'Джек',        icon:'🎃', img:'img/items/jack.png',      rarity:'secret',    value:15000 },
+  shadow:    { name:'Тень',        icon:'🌑', img:'img/items/shadow.png',    rarity:'secret',    value:20000 },
+  voidkey:   { name:'Войд',        icon:'🕳️', img:'img/items/voidkey.png',   rarity:'secret',    value:30000 }
 };
 
 const BY_RARITY = {};
@@ -61,20 +70,20 @@ Object.keys(ITEMS).forEach(function (k) {
 });
 
 const CASES = [
-  { id: 'c1', name: 'Обычный кейс',     icon: '📦', price: 100,
-    odds: { common: 70, uncommon: 25, rare: 4.5, epic: 0.5 } },
-  { id: 'c2', name: 'Редкий кейс',      icon: '🎁', price: 500,
-    odds: { common: 25, uncommon: 40, rare: 27, epic: 7, legendary: 1 } },
-  { id: 'c3', name: 'Эпический кейс',   icon: '💼', price: 1500,
-    odds: { uncommon: 30, rare: 42, epic: 23, legendary: 4.5, mythical: 0.5 } },
-  { id: 'c4', name: 'Легендарный кейс', icon: '👑', price: 5000,
-    odds: { rare: 28, epic: 46, legendary: 21, mythical: 4.5, secret: 0.5 } },
-  { id: 'c5', name: 'Кейс Бездны',      icon: '🕳️', price: 20000,
-    odds: { epic: 38, legendary: 42, mythical: 17, secret: 3 } }
+  { id:'c1', name:'Обычный кейс',     icon:'📦', img:'img/cases/c1.png', price:100,
+    odds:{ common:70, uncommon:25, rare:4.5, epic:0.5 } },
+  { id:'c2', name:'Редкий кейс',      icon:'🎁', img:'img/cases/c2.png', price:500,
+    odds:{ common:25, uncommon:40, rare:27, epic:7, legendary:1 } },
+  { id:'c3', name:'Эпический кейс',   icon:'💼', img:'img/cases/c3.png', price:1500,
+    odds:{ uncommon:30, rare:42, epic:23, legendary:4.5, mythical:0.5 } },
+  { id:'c4', name:'Легендарный кейс', icon:'👑', img:'img/cases/c4.png', price:5000,
+    odds:{ rare:28, epic:46, legendary:21, mythical:4.5, secret:0.5 } },
+  { id:'c5', name:'Кейс Бездны',      icon:'🕳️', img:'img/cases/c5.png', price:20000,
+    odds:{ epic:38, legendary:42, mythical:17, secret:3 } }
 ];
 
 /* ============================================================
-   2. ЗВУК (Web Audio API — без внешних файлов)
+   2. ЗВУК
    ============================================================ */
 
 const Sound = (function () {
@@ -170,7 +179,7 @@ function save() {
       stats: state.stats,
       sound: Sound.enabled
     }));
-  } catch (e) { /* приватный режим */ }
+  } catch (e) {}
 }
 
 function load() {
@@ -186,11 +195,9 @@ function load() {
       });
     }
     if (typeof d.uid === 'number' && d.uid > 0) state.uid = Math.floor(d.uid);
-    if (d.stats && typeof d.stats === 'object') {
-      state.stats = Object.assign(state.stats, d.stats);
-    }
+    if (d.stats && typeof d.stats === 'object') state.stats = Object.assign(state.stats, d.stats);
     if (typeof d.sound === 'boolean') Sound.setEnabled(d.sound);
-  } catch (e) { /* повреждённое сохранение — игнорируем */ }
+  } catch (e) {}
 }
 
 /* ============================================================
@@ -212,6 +219,20 @@ function rollItem(c) {
   const rar = weightedPick(c.odds);
   const pool = BY_RARITY[rar];
   return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/* Хелпер: HTML для иконки (img с фолбэком на эмодзи) */
+function iconHTML(data, sizeClass) {
+  const cls = sizeClass + ' icon-wrap';
+  const emoji = data.icon || '❓';
+  const img = data.img || '';
+  if (!img) {
+    return '<span class="' + cls + '"><span class="icon-emoji">' + emoji + '</span></span>';
+  }
+  return '<span class="' + cls + '">' +
+    '<span class="icon-emoji">' + emoji + '</span>' +
+    '<img class="icon-img" src="' + img + '" alt="" draggable="false" onerror="this.remove()">' +
+  '</span>';
 }
 
 let toastTimer = null;
@@ -254,7 +275,7 @@ const els = {
 };
 
 /* ============================================================
-   6. ОБЩИЙ РЕНДЕР
+   6. РЕНДЕР
    ============================================================ */
 
 function updateBalance() {
@@ -277,7 +298,7 @@ function renderCases() {
     });
 
     card.innerHTML =
-      '<div class="case-icon">' + c.icon + '</div>' +
+      iconHTML(c, 'case-icon') +
       '<div class="case-name">' + c.name + '</div>' +
       '<div class="case-price' + (poor ? ' is-poor' : '') + '">🪙 ' + fmt(c.price) + '</div>' +
       '<div class="case-best">Лучший дроп: <b style="color:' + RARITY[topRar].color + '">' +
@@ -304,7 +325,7 @@ function makeItemCard(inv, mode) {
   card.style.setProperty('--c', r.color);
 
   let html =
-    '<div class="ic-icon">' + it.icon + '</div>' +
+    iconHTML(it, 'ic-icon') +
     '<div class="ic-name">' + it.name + '</div>' +
     '<div class="ic-rar">' + r.name + '</div>' +
     '<div class="ic-val">🪙 ' + fmt(it.value) + '</div>';
@@ -352,7 +373,6 @@ function renderInventory(container, mode) {
 }
 
 function sellItem(uid) {
-  // ЗАЩИТА: во время вращения колеса ничего продавать нельзя
   if (wheelSpinning) { toast('Колесо крутится…'); Sound.error(); return; }
   if (spinningCase)  { toast('Подожди…'); Sound.error(); return; }
 
@@ -371,7 +391,7 @@ function sellItem(uid) {
    7. КЕЙСЫ — РУЛЕТКА
    ============================================================ */
 
-const REEL_STEP   = 134;   // 124px карточка + 10px отступ
+const REEL_STEP   = 134;
 const REEL_COUNT  = 54;
 const REEL_WIN_IX = 46;
 
@@ -384,7 +404,7 @@ function makeReelItem(key) {
   d.className = 'reel-item';
   d.style.setProperty('--c', r.color);
   d.innerHTML =
-    '<div class="ri-icon">' + it.icon + '</div>' +
+    iconHTML(it, 'ri-icon') +
     '<div class="ri-name">' + it.name + '</div>' +
     '<div class="ri-rar">' + r.name + '</div>';
   return d;
@@ -459,12 +479,11 @@ let targetKey     = null;
 let wheelSpinning = false;
 let needleDeg     = 0;
 let wheelCssSize  = 340;
-let spinStake     = null;   // { uid, key } — предмет, поставленный на кон
+let spinStake     = null;
 
 const canvas = els.canvas;
-const ctx2d  = canvas.getContext('2d');
+const ctx2d  = canvas.getContext('2d', { alpha: true });
 
-/* ---- цветовая рампа ---- */
 const RAMP = [
   [0.00, [239, 68, 68]],
   [0.35, [249, 115, 22]],
@@ -502,13 +521,24 @@ function chanceLabel(ch) {
   return 'отличный шанс';
 }
 
-/* ---- размер ---- */
+/* ---- batched resize ---- */
+let wheelResizeRaf = null;
+function requestWheelResize() {
+  if (wheelResizeRaf) cancelAnimationFrame(wheelResizeRaf);
+  wheelResizeRaf = requestAnimationFrame(function () {
+    wheelResizeRaf = null;
+    resizeWheel();
+  });
+}
+
 function resizeWheel() {
   const rect = els.wheel.getBoundingClientRect();
   const size = Math.round(rect.width) || 340;
+  if (size === wheelCssSize) return;
   wheelCssSize = size;
 
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const maxDpr = IS_MOBILE ? 1.5 : 2;
+  const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
   canvas.width  = Math.round(size * dpr);
   canvas.height = Math.round(size * dpr);
   ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -516,7 +546,6 @@ function resizeWheel() {
   drawWheel();
 }
 
-/* ---- отрисовка ---- */
 function drawWheel() {
   const size = wheelCssSize;
   const cx = size / 2, cy = size / 2;
@@ -524,24 +553,23 @@ function drawWheel() {
 
   ctx2d.clearRect(0, 0, size, size);
 
-  /* фон */
   ctx2d.beginPath();
   ctx2d.arc(cx, cy, R, 0, Math.PI * 2);
   ctx2d.fillStyle = '#0c0c11';
   ctx2d.fill();
 
-  /* внешнее тонкое кольцо */
   ctx2d.beginPath();
   ctx2d.arc(cx, cy, R - 1, 0, Math.PI * 2);
   ctx2d.strokeStyle = '#2c2c38';
   ctx2d.lineWidth = 2;
   ctx2d.stroke();
 
-  /* деления */
+  /* тики — на мобилке рисуем реже */
+  const tickStep = IS_MOBILE ? 9 : 4.5;
   const tickOuter = R - 10;
   const tickInner = R - 17;
   ctx2d.lineWidth = 1.6;
-  for (let deg = 0; deg < 360; deg += 4.5) {
+  for (let deg = 0; deg < 360; deg += tickStep) {
     const a = (deg - 90) * Math.PI / 180;
     const big = Math.abs(deg % 45) < 0.1;
     ctx2d.beginPath();
@@ -551,7 +579,6 @@ function drawWheel() {
     ctx2d.stroke();
   }
 
-  /* тёмная дорожка кольца */
   const ringR = R - 36;
   const ringW = 28;
   ctx2d.beginPath();
@@ -560,18 +587,19 @@ function drawWheel() {
   ctx2d.lineWidth = ringW;
   ctx2d.stroke();
 
-  /* цветная дуга шанса */
   const chance = getChance();
   if (chance > 0.001) {
     const sweep = chance * Math.PI * 2;
     const start = -Math.PI / 2;
-    const segs = Math.max(3, Math.ceil(sweep / (Math.PI / 180) / 2.5));
+    const segs = IS_MOBILE
+      ? Math.max(2, Math.ceil(sweep / (Math.PI / 180) / 6))
+      : Math.max(3, Math.ceil(sweep / (Math.PI / 180) / 2.5));
 
-    ctx2d.save();
-    ctx2d.shadowColor = 'rgba(217,242,75,.30)';
-    ctx2d.shadowBlur = 16;
-    ctx2d.lineCap = 'butt';
     ctx2d.lineWidth = ringW;
+    if (!IS_MOBILE) {
+      ctx2d.shadowColor = 'rgba(217,242,75,.30)';
+      ctx2d.shadowBlur = 16;
+    }
 
     for (let i = 0; i < segs; i++) {
       const a0 = start + (i / segs) * sweep;
@@ -581,20 +609,20 @@ function drawWheel() {
       ctx2d.strokeStyle = rampColor(i / (segs - 1 || 1));
       ctx2d.stroke();
     }
-    ctx2d.restore();
+    ctx2d.shadowBlur = 0;
 
-    /* светящаяся точка на конце дуги */
     const endA = start + sweep;
     ctx2d.beginPath();
     ctx2d.arc(cx + Math.cos(endA) * ringR, cy + Math.sin(endA) * ringR, 5, 0, Math.PI * 2);
     ctx2d.fillStyle = '#ffffff';
-    ctx2d.shadowColor = '#d9f24b';
-    ctx2d.shadowBlur = 14;
+    if (!IS_MOBILE) {
+      ctx2d.shadowColor = '#d9f24b';
+      ctx2d.shadowBlur = 14;
+    }
     ctx2d.fill();
     ctx2d.shadowBlur = 0;
   }
 
-  /* центральный круг */
   ctx2d.beginPath();
   ctx2d.arc(cx, cy, ringR - ringW / 2 - 8, 0, Math.PI * 2);
   ctx2d.fillStyle = '#0d0d13';
@@ -604,7 +632,6 @@ function drawWheel() {
   ctx2d.stroke();
 }
 
-/* ---- UI апгрейда ---- */
 function selectItem(uid) {
   if (wheelSpinning) return;
   Sound.click();
@@ -624,13 +651,12 @@ function selectTarget(key) {
 function renderSlots() {
   const sel = selectedUid ? state.inventory.find(function (x) { return x.uid === selectedUid; }) : null;
 
-  /* from */
   if (sel) {
     const it = ITEMS[sel.key], r = RARITY[it.rarity];
     els.slotFrom.className = 'slot is-filled';
     els.slotFrom.style.setProperty('--c', r.color);
     els.slotFrom.innerHTML =
-      '<div class="slot-icon">' + it.icon + '</div>' +
+      iconHTML(it, 'slot-icon') +
       '<div class="slot-name">' + it.name + '</div>' +
       '<div class="slot-val">🪙 ' + fmt(it.value) + '</div>';
   } else {
@@ -639,13 +665,12 @@ function renderSlots() {
     els.slotFrom.innerHTML = '<span class="slot-empty">Пусто</span>';
   }
 
-  /* to */
   if (targetKey) {
     const it = ITEMS[targetKey], r = RARITY[it.rarity];
     els.slotTo.className = 'slot is-filled';
     els.slotTo.style.setProperty('--c', r.color);
     els.slotTo.innerHTML =
-      '<div class="slot-icon">' + it.icon + '</div>' +
+      iconHTML(it, 'slot-icon') +
       '<div class="slot-name">' + it.name + '</div>' +
       '<div class="slot-val">🪙 ' + fmt(it.value) + '</div>';
   } else {
@@ -687,7 +712,7 @@ function renderTargets() {
     card.className = 'item-card' + (targetKey === k ? ' is-selected' : '');
     card.style.setProperty('--c', r.color);
     card.innerHTML =
-      '<div class="ic-icon">' + it.icon + '</div>' +
+      iconHTML(it, 'ic-icon') +
       '<div class="ic-name">' + it.name + '</div>' +
       '<div class="ic-rar">' + r.name + '</div>' +
       '<div class="ic-val">🪙 ' + fmt(it.value) + '</div>' +
@@ -719,9 +744,10 @@ function updateWheelUI() {
   drawWheel();
 }
 
-/* ---- ВРАЩЕНИЕ ---- */
 function spinWheel() {
   if (wheelSpinning) return;
+  if (spinningCase) return;
+
   if (!selectedUid || !targetKey) return;
 
   const sel = state.inventory.find(function (x) { return x.uid === selectedUid; });
@@ -733,29 +759,23 @@ function spinWheel() {
   wheelSpinning = true;
   els.spinBtn.disabled = true;
   els.spinBtn.textContent = 'КРУТИМ…';
+  els.needle.classList.add('is-spinning');
 
-  // ========== ЗАЩИТА ОТ БАГА ==========
-  // 1. Запоминаем предмет, поставленный на кон
   spinStake = { uid: selectedUid, key: sel.key };
-
-  // 2. СРАЗУ удаляем его из инвентаря — теперь его нельзя продать
   state.inventory = state.inventory.filter(function (x) { return x.uid !== spinStake.uid; });
 
-  // 3. Блокируем весь UI
   els.invUpgrade.classList.add('is-locked');
   els.invTargets.classList.add('is-locked');
   els.sellAllBtn.disabled = true;
 
-  // 4. Обновляем отображение (предмет уже пропал из инвентаря, но слот "from" показываем вручную)
   renderInventory(els.invUpgrade, 'select');
   renderInventory(els.invCases, 'sell');
 
-  // 5. Слот "from" показываем как "в игре" — используем сохранённый spinStake
   const stakeIt = ITEMS[spinStake.key], stakeR = RARITY[stakeIt.rarity];
   els.slotFrom.className = 'slot is-filled';
   els.slotFrom.style.setProperty('--c', stakeR.color);
   els.slotFrom.innerHTML =
-    '<div class="slot-icon">' + stakeIt.icon + '</div>' +
+    iconHTML(stakeIt, 'slot-icon') +
     '<div class="slot-name">' + stakeIt.name + '</div>' +
     '<div class="slot-val">🪙 ' + fmt(stakeIt.value) + '</div>';
 
@@ -809,16 +829,13 @@ function spinWheel() {
 function finishSpin(isWin) {
   wheelSpinning = false;
   els.spinBtn.textContent = 'ПРОКАЧАТЬ';
+  els.needle.classList.remove('is-spinning');
 
-  // снимаем блокировку
   els.invUpgrade.classList.remove('is-locked');
   els.invTargets.classList.remove('is-locked');
   els.sellAllBtn.disabled = false;
 
-  const staked = spinStake;
   spinStake = null;
-
-  // предмет уже удалён из инвентаря в начале спина — здесь только добавляем выигрыш
 
   if (isWin) {
     const won = targetKey;
@@ -854,7 +871,7 @@ function showModal(key, uid, title) {
   els.modalTitle.textContent = title || 'Вы получили';
   els.modalItem.style.setProperty('--c', r.color);
   els.modalItem.innerHTML =
-    '<div class="mi-icon">' + it.icon + '</div>' +
+    iconHTML(it, 'mi-icon') +
     '<div class="mi-name">' + it.name + '</div>' +
     '<div class="mi-rar">' + r.name + '</div>' +
     '<div class="mi-val">🪙 ' + fmt(it.value) + '</div>';
@@ -887,7 +904,6 @@ function updateAll() {
    11. СОБЫТИЯ
    ============================================================ */
 
-/* вкладки */
 document.querySelectorAll('.tab-btn').forEach(function (btn) {
   btn.addEventListener('click', function () {
     Sound.click();
@@ -897,16 +913,17 @@ document.querySelectorAll('.tab-btn').forEach(function (btn) {
     $('page-' + btn.dataset.tab).classList.add('is-active');
 
     if (btn.dataset.tab === 'upgrades') {
-      requestAnimationFrame(resizeWheel);
+      requestAnimationFrame(function () {
+        wheelCssSize = 0;   // форсируем пересчёт
+        requestWheelResize();
+      });
     }
   });
 });
 
-/* кнопки */
 els.spinBtn.addEventListener('click', spinWheel);
 
 els.sellAllBtn.addEventListener('click', function () {
-  // ЗАЩИТА: во время вращения колеса / прокрутки кейса продавать нельзя
   if (wheelSpinning) { toast('Колесо крутится…'); Sound.error(); return; }
   if (spinningCase)  { toast('Подожди…'); Sound.error(); return; }
 
@@ -946,12 +963,9 @@ els.resetBtn.addEventListener('click', function () {
   updateAll();
 });
 
-/* модалка */
 els.modalOk.addEventListener('click', function () { Sound.click(); closeModal(); });
 els.modalSell.addEventListener('click', function () {
-  // ЗАЩИТА: если колесо крутится — не продаём
   if (wheelSpinning) { toast('Колесо крутится…'); Sound.error(); return; }
-
   if (modalUid !== null) {
     const uid = modalUid;
     closeModal();
@@ -962,21 +976,18 @@ els.modal.addEventListener('click', function (e) {
   if (e.target === els.modal) closeModal();
 });
 
-/* ресайз колеса */
 if (window.ResizeObserver) {
-  new ResizeObserver(function () { resizeWheel(); }).observe(els.wheel);
+  new ResizeObserver(function () { requestWheelResize(); }).observe(els.wheel);
 }
 window.addEventListener('resize', function () {
   clearTimeout(window.__wheelT);
-  window.__wheelT = setTimeout(resizeWheel, 120);
+  window.__wheelT = setTimeout(requestWheelResize, 150);
 });
 
-/* разблокировка звука по первому клику */
 document.addEventListener('pointerdown', function () { Sound.unlock(); }, { once: true });
 
-/* горячая клавиша: пробел = крутить */
 document.addEventListener('keydown', function (e) {
-  if (e.code === 'Space' && document.getElementById('page-upgrades').classList.contains('is-active')) {
+  if (e.code === 'Space' && $('page-upgrades').classList.contains('is-active')) {
     e.preventDefault();
     if (!els.spinBtn.disabled) spinWheel();
   }
@@ -990,4 +1001,4 @@ els.soundBtn.textContent = Sound.enabled ? '🔊' : '🔇';
 els.soundBtn.classList.toggle('off', !Sound.enabled);
 
 updateAll();
-requestAnimationFrame(resizeWheel);
+requestAnimationFrame(function () { wheelCssSize = 0; requestWheelResize(); });
